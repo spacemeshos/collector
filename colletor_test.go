@@ -13,37 +13,37 @@ type MockDb struct {
 	total int
 }
 
-func (m *MockDb) StoreBlock(event events.NewBlockEvent) error {
+func (m *MockDb) StoreBlock(event *events.NewBlockEvent) error {
 	m.msgs[1]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreBlockValid(event events.ValidBlockEvent) error {
+func (m *MockDb) StoreBlockValid(event *events.ValidBlockEvent) error {
 	m.msgs[2]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreTx(event events.NewTxEvent) error {
+func (m *MockDb) StoreTx(event *events.NewTxEvent) error {
 	m.msgs[3]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreTxValid(event events.ValidTxEvent) error {
+func (m *MockDb) StoreTxValid(event *events.ValidTxEvent) error {
 	m.msgs[4]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreAtx(event events.NewAtxEvent) error {
+func (m *MockDb) StoreAtx(event *events.NewAtxEvent) error {
 	m.msgs[5]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreAtxValid(event events.ValidAtxEvent) error {
+func (m *MockDb) StoreAtxValid(event *events.ValidAtxEvent) error {
 	m.msgs[6]++
 	m.total++
 	return nil
@@ -61,7 +61,7 @@ func TestCollectEvents(t *testing.T) {
 		assert.NoError(t, eventPublisher.Close())
 	}()
 
-	c.Start()
+	c.Start(false)
 	time.Sleep(2 * time.Second)
 	orig := events.NewBlockEvent{Layer: 1, Block: 234}
 	err = eventPublisher.PublishEvent(orig)

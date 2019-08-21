@@ -7,9 +7,9 @@ import (
 )
 
 func Test_WriteObjectToDB(t *testing.T){
-	db := NewDbNow()
+	db := NewDb()
 	defer func() { assert.NoError(t, db.Close()) }()
-	err := db.createTables()
+	err := db.createTables(true)
 	assert.NoError(t, err)
 
 	err = db.StoreBlock(&events.NewBlockEvent{Block:1234,Layer:1,Atx:"1234"})

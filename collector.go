@@ -18,16 +18,21 @@ func NewCollector(db Db, url string) *eventsCollector {
 }
 
 type Db interface {
-	StoreBlock(event events.NewBlockEvent) error
-	StoreBlockValid(event events.ValidBlockEvent) error
-	StoreTx(event events.NewTxEvent) error
-	StoreTxValid(event events.ValidTxEvent) error
-	StoreAtx(event events.NewAtxEvent) error
-	StoreAtxValid(event events.ValidAtxEvent) error
+	StoreBlock(event *events.NewBlockEvent) error
+	StoreBlockValid(event *events.ValidBlockEvent) error
+	StoreTx(event *events.NewTxEvent) error
+	StoreTxValid(event *events.ValidTxEvent) error
+	StoreAtx(event *events.NewAtxEvent) error
+	StoreAtxValid(event *events.ValidAtxEvent) error
 }
 
-func (c *eventsCollector) Start() {
-	go c.collectEvents(c.url)
+func (c *eventsCollector) Start(blocking bool) {
+	if blocking {
+		c.collectEvents(c.url)
+	} else {
+		go c.collectEvents(c.url)
+	}
+
 }
 
 func (c *eventsCollector) Stop(){
@@ -63,7 +68,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreBlock(e)
+			err = c.db.StoreBlock(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
@@ -73,7 +78,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreBlockValid(e)
+			err = c.db.StoreBlockValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
@@ -83,7 +88,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreTx(e)
+			err = c.db.StoreTx(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
@@ -93,7 +98,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreTxValid(e)
+			err = c.db.StoreTxValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
@@ -103,7 +108,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreAtx(e)
+			err = c.db.StoreAtx(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
@@ -113,7 +118,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
-			err = c.db.StoreAtxValid(e)
+			err = c.db.StoreAtxValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}

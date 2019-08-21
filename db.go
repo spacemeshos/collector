@@ -37,7 +37,7 @@ type Database struct {
 	inst *pg.DB
 }
 
-func NewDbNow() *Database {
+func NewDb() *Database {
 	d := Database{nil}
 	d.inst = pg.Connect(&pg.Options{
 		User:     "postgres",
@@ -51,7 +51,7 @@ func (db *Database) Close() error{
 	return db.inst.Close()
 }
 
-func (db *Database) createTables() error{
+func (db *Database) createTables(tempDb bool) error{
 	for _, model := range []interface{}{(*events.NewBlockEvent)(nil),
 		(*events.ValidBlockEvent)(nil),
 		(*events.NewTxEvent)(nil),
@@ -60,6 +60,7 @@ func (db *Database) createTables() error{
 		(*events.ValidAtxEvent)(nil)} {
 		err := db.inst.CreateTable(model, &orm.CreateTableOptions{
 			IfNotExists:true,
+			Temp:tempDb,
 		})
 		if err != nil {
 			return err
