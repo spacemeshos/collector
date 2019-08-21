@@ -6,27 +6,27 @@ import (
 	"github.com/spacemeshos/go-spacemesh/events"
 )
 
-func (db *Database) StoreBlock(event *events.NewBlockEvent) error {
+func (db *Database) StoreBlock(event *events.NewBlock) error {
 	return db.inst.Insert(event)
 }
-func (db *Database) StoreBlockValid(event *events.ValidBlockEvent) error {
+func (db *Database) StoreBlockValid(event *events.ValidBlock) error {
 	return db.inst.Insert(event)
 }
-func (db *Database) StoreTx(event *events.NewTxEvent) error {
+func (db *Database) StoreTx(event *events.NewTx) error {
 	return db.inst.Insert(event)
 }
-func (db *Database) StoreTxValid(event *events.ValidTxEvent) error {
+func (db *Database) StoreTxValid(event *events.ValidTx) error {
 	return db.inst.Insert(event)
 }
-func (db *Database) StoreAtx(event *events.NewAtxEvent) error {
+func (db *Database) StoreAtx(event *events.NewAtx) error {
 	return db.inst.Insert(event)
 }
-func (db *Database) StoreAtxValid(event *events.ValidAtxEvent) error {
+func (db *Database) StoreAtxValid(event *events.ValidAtx) error {
 	return db.inst.Insert(event)
 }
 
-func (db *Database) AllBlocks() ([]*events.NewBlockEvent, error){
-	var blocks []*events.NewBlockEvent
+func (db *Database) AllBlocks() ([]*events.NewBlock, error){
+	var blocks []*events.NewBlock
 	err := db.inst.Model(&blocks).Select()
 	return blocks, err
 }
@@ -52,12 +52,12 @@ func (db *Database) Close() error{
 }
 
 func (db *Database) createTables(tempDb bool) error{
-	for _, model := range []interface{}{(*events.NewBlockEvent)(nil),
-		(*events.ValidBlockEvent)(nil),
-		(*events.NewTxEvent)(nil),
-		(*events.ValidTxEvent)(nil),
-		(*events.NewAtxEvent)(nil),
-		(*events.ValidAtxEvent)(nil)} {
+	for _, model := range []interface{}{(*events.NewBlock)(nil),
+		(*events.ValidBlock)(nil),
+		(*events.NewTx)(nil),
+		(*events.ValidTx)(nil),
+		(*events.NewAtx)(nil),
+		(*events.ValidAtx)(nil)} {
 		err := db.inst.CreateTable(model, &orm.CreateTableOptions{
 			IfNotExists:true,
 			Temp:tempDb,

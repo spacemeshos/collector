@@ -13,37 +13,37 @@ type MockDb struct {
 	total int
 }
 
-func (m *MockDb) StoreBlock(event *events.NewBlockEvent) error {
+func (m *MockDb) StoreBlock(event *events.NewBlock) error {
 	m.msgs[1]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreBlockValid(event *events.ValidBlockEvent) error {
+func (m *MockDb) StoreBlockValid(event *events.ValidBlock) error {
 	m.msgs[2]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreTx(event *events.NewTxEvent) error {
+func (m *MockDb) StoreTx(event *events.NewTx) error {
 	m.msgs[3]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreTxValid(event *events.ValidTxEvent) error {
+func (m *MockDb) StoreTxValid(event *events.ValidTx) error {
 	m.msgs[4]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreAtx(event *events.NewAtxEvent) error {
+func (m *MockDb) StoreAtx(event *events.NewAtx) error {
 	m.msgs[5]++
 	m.total++
 	return nil
 }
 
-func (m *MockDb) StoreAtxValid(event *events.ValidAtxEvent) error {
+func (m *MockDb) StoreAtxValid(event *events.ValidAtx) error {
 	m.msgs[6]++
 	m.total++
 	return nil
@@ -63,22 +63,22 @@ func TestCollectEvents(t *testing.T) {
 
 	c.Start(false)
 	time.Sleep(2 * time.Second)
-	orig := events.NewBlockEvent{Layer: 1, Block: 234}
+	orig := events.NewBlock{Layer: 1, Id: 234}
 	err = eventPublisher.PublishEvent(orig)
 
-	orig1 := events.ValidBlockEvent{Block: 234, Valid: true}
+	orig1 := events.ValidBlock{Id: 234, Valid: true}
 	err = eventPublisher.PublishEvent(orig1)
 
-	orig2 := events.NewAtxEvent{AtxId: "1234"}
+	orig2 := events.NewAtx{Id: "1234"}
 	err = eventPublisher.PublishEvent(orig2)
 
-	orig3 := events.ValidAtxEvent{AtxId: "1234", Valid: true}
+	orig3 := events.ValidAtx{Id: "1234", Valid: true}
 	err = eventPublisher.PublishEvent(orig3)
 
-	orig4 := events.NewTxEvent{TxId: "4321", Gas: 20, Amount: 400, Destination: "1234567", Origin: "876543"}
+	orig4 := events.NewTx{Id: "4321", Gas: 20, Amount: 400, Destination: "1234567", Origin: "876543"}
 	err = eventPublisher.PublishEvent(orig4)
 
-	orig5 := events.ValidTxEvent{TxId:"4321", Valid:true}
+	orig5 := events.ValidTx{Id:"4321", Valid:true}
 	err = eventPublisher.PublishEvent(orig5)
 
 	time.Sleep(1 * time.Second)

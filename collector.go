@@ -18,12 +18,12 @@ func NewCollector(db Db, url string) *eventsCollector {
 }
 
 type Db interface {
-	StoreBlock(event *events.NewBlockEvent) error
-	StoreBlockValid(event *events.ValidBlockEvent) error
-	StoreTx(event *events.NewTxEvent) error
-	StoreTxValid(event *events.ValidTxEvent) error
-	StoreAtx(event *events.NewAtxEvent) error
-	StoreAtxValid(event *events.ValidAtxEvent) error
+	StoreBlock(event *events.NewBlock) error
+	StoreBlockValid(event *events.ValidBlock) error
+	StoreTx(event *events.NewTx) error
+	StoreTxValid(event *events.ValidTx) error
+	StoreAtx(event *events.NewAtx) error
+	StoreAtxValid(event *events.ValidAtx) error
 }
 
 func (c *eventsCollector) Start(blocking bool) {
@@ -45,25 +45,25 @@ func (c *eventsCollector) collectEvents(url string) {
 		log.Info("cannot start subscriber")
 		return
 	}
-	blocks, err := sub.Subscribe(events.NewBlock)
-	blocksValid, err := sub.Subscribe(events.BlockValid)
-	txs, err := sub.Subscribe(events.NewTx)
-	txValid, err := sub.Subscribe(events.TxValid)
-	atxs, err := sub.Subscribe(events.NewAtx)
-	atxsValid, err := sub.Subscribe(events.AtxValid)
+	blocks, err := sub.Subscribe(events.EventNewBlock)
+	blocksValid, err := sub.Subscribe(events.EventBlockValid)
+	txs, err := sub.Subscribe(events.EventNewTx)
+	txValid, err := sub.Subscribe(events.EventTxValid)
+	atxs, err := sub.Subscribe(events.EventNewAtx)
+	atxsValid, err := sub.Subscribe(events.EventAtxValid)
 	sub.StartListening()
 	if err != nil {
 		log.Info("cannot start subscriber")
 		return
 	}
 	// get the size of message header
-	size := unsafe.Sizeof(events.TxValid)
+	size := unsafe.Sizeof(events.EventTxValid)
 
 	loop:
 	for {
 		select {
 		case data  := <- blocks:
-			var e events.NewBlockEvent
+			var e events.NewBlock
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
@@ -73,7 +73,7 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot write message %v", err)
 			}
 		case data  := <- blocksValid:
-			var e events.ValidBlockEvent
+			var e events.ValidBlock
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
@@ -83,7 +83,7 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot write message %v", err)
 			}
 		case data  := <- txs:
-			var e events.NewTxEvent
+			var e events.NewTx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
@@ -93,7 +93,7 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot write message %v", err)
 			}
 		case data  := <- txValid:
-			var e events.ValidTxEvent
+			var e events.ValidTx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
@@ -103,7 +103,7 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot write message %v", err)
 			}
 		case data  := <- atxs:
-			var e events.NewAtxEvent
+			var e events.NewAtx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
@@ -113,7 +113,7 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot write message %v", err)
 			}
 		case data  := <- atxsValid:
-			var e events.ValidAtxEvent
+			var e events.ValidAtx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
