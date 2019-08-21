@@ -4,15 +4,17 @@ import (
 	"github.com/spacemeshos/go-spacemesh/events"
 	"github.com/spacemeshos/go-spacemesh/log"
 	"github.com/spacemeshos/go-spacemesh/types"
+	"unsafe"
 )
 
-type collector struct{
+type eventsCollector struct{
+	url string
 	stop chan struct{}
 	db Db
 }
 
-func NewCollector(db Db) *collector{
-	return &collector{make(chan struct{}),db}
+func NewCollector(db Db, url string) *eventsCollector {
+	return &eventsCollector{url,make(chan struct{}),db}
 }
 
 type Db interface {
@@ -24,7 +26,15 @@ type Db interface {
 	StoreAtxValid(event events.ValidAtxEvent) error
 }
 
-func (c *collector) collectEvents(url string) {
+func (c *eventsCollector) Start() {
+	go c.collectEvents(c.url)
+}
+
+func (c *eventsCollector) Stop(){
+	c.stop <- struct{}{}
+}
+
+func (c *eventsCollector) collectEvents(url string) {
 	sub, err := events.NewSubscriber(url)
 	if err != nil {
 		log.Info("cannot start subscriber")
@@ -36,17 +46,20 @@ func (c *collector) collectEvents(url string) {
 	txValid, err := sub.Subscribe(events.TxValid)
 	atxs, err := sub.Subscribe(events.NewAtx)
 	atxsValid, err := sub.Subscribe(events.AtxValid)
+	sub.StartListening()
 	if err != nil {
 		log.Info("cannot start subscriber")
 		return
 	}
+	// get the size of message header
+	size := unsafe.Sizeof(events.TxValid)
 
 	loop:
 	for {
 		select {
 		case data  := <- blocks:
 			var e events.NewBlockEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
@@ -56,7 +69,7 @@ func (c *collector) collectEvents(url string) {
 			}
 		case data  := <- blocksValid:
 			var e events.ValidBlockEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
@@ -66,7 +79,7 @@ func (c *collector) collectEvents(url string) {
 			}
 		case data  := <- txs:
 			var e events.NewTxEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
@@ -76,7 +89,7 @@ func (c *collector) collectEvents(url string) {
 			}
 		case data  := <- txValid:
 			var e events.ValidTxEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
@@ -86,7 +99,7 @@ func (c *collector) collectEvents(url string) {
 			}
 		case data  := <- atxs:
 			var e events.NewAtxEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
@@ -96,7 +109,7 @@ func (c *collector) collectEvents(url string) {
 			}
 		case data  := <- atxsValid:
 			var e events.ValidAtxEvent
-			err := types.BytesToInterface(data, e)
+			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}

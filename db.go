@@ -1,44 +1,44 @@
 package collector
 
 import (
-	"github.com/go-pg/pg"
-	"github.com/go-pg/pg/orm"
+	"github.com/go-pg/pg/v9"
+	"github.com/go-pg/pg/v9/orm"
 	"github.com/spacemeshos/go-spacemesh/events"
 )
 
-func (db *db) StoreBlock(event events.NewBlockEvent) error {
+func (db *Database) StoreBlock(event *events.NewBlockEvent) error {
 	return db.inst.Insert(event)
 }
-func (db *db) StoreBlockValid(event events.ValidBlockEvent) error {
+func (db *Database) StoreBlockValid(event *events.ValidBlockEvent) error {
 	return db.inst.Insert(event)
 }
-func (db *db) StoreTx(event events.NewTxEvent) error {
+func (db *Database) StoreTx(event *events.NewTxEvent) error {
 	return db.inst.Insert(event)
 }
-func (db *db) StoreTxValid(event events.ValidTxEvent) error {
+func (db *Database) StoreTxValid(event *events.ValidTxEvent) error {
 	return db.inst.Insert(event)
 }
-func (db *db) StoreAtx(event events.NewAtxEvent) error {
+func (db *Database) StoreAtx(event *events.NewAtxEvent) error {
 	return db.inst.Insert(event)
 }
-func (db *db) StoreAtxValid(event events.ValidAtxEvent) error {
+func (db *Database) StoreAtxValid(event *events.ValidAtxEvent) error {
 	return db.inst.Insert(event)
 }
 
-func (db *db) AllBlocks() ([]events.NewBlockEvent, error){
-	var blocks []events.NewBlockEvent
-	err := db.inst.Select(&blocks)
+func (db *Database) AllBlocks() ([]*events.NewBlockEvent, error){
+	var blocks []*events.NewBlockEvent
+	err := db.inst.Model(&blocks).Select()
 	return blocks, err
 }
 
 
 
-type db struct {
+type Database struct {
 	inst *pg.DB
 }
 
-func NewDb() *db {
-	d := db{nil}
+func NewDbNow() *Database {
+	d := Database{nil}
 	d.inst = pg.Connect(&pg.Options{
 		User:     "postgres",
 		Password: "mysecretpassword",
@@ -47,11 +47,11 @@ func NewDb() *db {
 }
 
 
-func (db *db) Close() error{
+func (db *Database) Close() error{
 	return db.inst.Close()
 }
 
-func (db *db) createTables() error{
+func (db *Database) createTables() error{
 	for _, model := range []interface{}{(*events.NewBlockEvent)(nil),
 		(*events.ValidBlockEvent)(nil),
 		(*events.NewTxEvent)(nil),
