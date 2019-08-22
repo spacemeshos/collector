@@ -28,20 +28,20 @@ func (db *Database) StoreReward(event *events.RewardReceived) error {
 	return db.inst.Insert(event)
 }
 
-func (db *Database) AllBlocks() ([]*events.NewBlock, error){
+func (db *Database) AllBlocks() ([]*events.NewBlock, error) {
 	var blocks []*events.NewBlock
 	err := db.inst.Model(&blocks).Select()
 	return blocks, err
 }
 
-func (db *Database) GetTransactionsFrom(origin string) ([]*events.NewTx, error){
+func (db *Database) GetTransactionsFrom(origin string) ([]*events.NewTx, error) {
 	var blocks []*events.NewTx
 	err := db.inst.Model(&blocks).Where("origin = ?", origin).Select()
 	return blocks, err
 
 }
 
-func (db *Database) GetTransactionsTo(origin string) ([]*events.NewTx, error){
+func (db *Database) GetTransactionsTo(origin string) ([]*events.NewTx, error) {
 	var blocks []*events.NewTx
 	err := db.inst.Model(&blocks).Where("origin = ?", origin).Select()
 	return blocks, err
@@ -55,7 +55,7 @@ type Database struct {
 
 // NewDb creates a new database connection using userName and password to the database instance.
 // It will connect to postgress DB on port 5432 (Postgres default port).
-func NewDb(userName , pass string) *Database {
+func NewDb(userName, pass string) *Database {
 	d := Database{nil}
 	d.inst = pg.Connect(&pg.Options{
 		User:     userName,
@@ -65,18 +65,18 @@ func NewDb(userName , pass string) *Database {
 }
 
 // Start tries to initialize the tables inside the db.
-func (db *Database) Start() error{
+func (db *Database) Start() error {
 	return db.createTables(false)
 }
 
 // Close closes active connections to the db.
-func (db *Database) Close() error{
+func (db *Database) Close() error {
 	return db.inst.Close()
 }
 
 // createTables uses pg orm to create a database based on the objects provided.
 // it can generate a temporary DB for testing purposes.
-func (db *Database) createTables(tempDb bool) error{
+func (db *Database) createTables(tempDb bool) error {
 	for _, model := range []interface{}{(*events.NewBlock)(nil),
 		(*events.ValidBlock)(nil),
 		(*events.NewTx)(nil),
@@ -85,8 +85,8 @@ func (db *Database) createTables(tempDb bool) error{
 		(*events.ValidAtx)(nil),
 		(*events.RewardReceived)(nil)} {
 		err := db.inst.CreateTable(model, &orm.CreateTableOptions{
-			IfNotExists:true,
-			Temp:tempDb,
+			IfNotExists: true,
+			Temp:        tempDb,
 		})
 		if err != nil {
 			return err
@@ -94,5 +94,3 @@ func (db *Database) createTables(tempDb bool) error{
 	}
 	return nil
 }
-
-

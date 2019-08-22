@@ -8,15 +8,15 @@ import (
 )
 
 // eventsCollector collects events from node and writes them to DB
-type eventsCollector struct{
-	url string
+type eventsCollector struct {
+	url  string
 	stop chan struct{}
-	db Db
+	db   Db
 }
 
 // NewCollector created a new instance of the collector listening on url for events and writing them to the provided Db
 func NewCollector(db Db, url string) *eventsCollector {
-	return &eventsCollector{url,make(chan struct{}),db}
+	return &eventsCollector{url, make(chan struct{}), db}
 }
 
 type Db interface {
@@ -38,7 +38,7 @@ func (c *eventsCollector) Start(blocking bool) {
 
 }
 
-func (c *eventsCollector) Stop(){
+func (c *eventsCollector) Stop() {
 	c.stop <- struct{}{}
 }
 
@@ -63,10 +63,10 @@ func (c *eventsCollector) collectEvents(url string) {
 	// get the size of message header
 	size := unsafe.Sizeof(events.EventTxValid)
 
-	loop:
+loop:
 	for {
 		select {
-		case data  := <- blocks:
+		case data := <-blocks:
 			var e events.NewBlock
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -76,7 +76,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- blocksValid:
+		case data := <-blocksValid:
 			var e events.ValidBlock
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -86,7 +86,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- txs:
+		case data := <-txs:
 			var e events.NewTx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -96,7 +96,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- txValid:
+		case data := <-txValid:
 			var e events.ValidTx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -106,7 +106,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- atxs:
+		case data := <-atxs:
 			var e events.NewAtx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -116,7 +116,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- atxsValid:
+		case data := <-atxsValid:
 			var e events.ValidAtx
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -126,7 +126,7 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-		case data  := <- reward:
+		case data := <-reward:
 			var e events.RewardReceived
 			err := types.BytesToInterface(data[size:], &e)
 			if err != nil {
@@ -136,8 +136,8 @@ func (c *eventsCollector) collectEvents(url string) {
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}
-			case <-c.stop:
-				break loop
+		case <-c.stop:
+			break loop
 		}
 	}
 }

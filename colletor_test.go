@@ -9,7 +9,7 @@ import (
 )
 
 type MockDb struct {
-	msgs map[byte]int
+	msgs  map[byte]int
 	total int
 }
 
@@ -60,7 +60,6 @@ func TestCollectEvents(t *testing.T) {
 	m := &MockDb{make(map[byte]int), 0}
 	c := NewCollector(m, url)
 
-
 	eventPublisher, err := events.NewEventPublisher(url)
 	assert.NoError(t, err)
 	defer func() {
@@ -84,7 +83,7 @@ func TestCollectEvents(t *testing.T) {
 	orig4 := events.NewTx{Id: "4321", Gas: 20, Amount: 400, Destination: "1234567", Origin: "876543"}
 	err = eventPublisher.PublishEvent(orig4)
 
-	orig5 := events.ValidTx{Id:"4321", Valid:true}
+	orig5 := events.ValidTx{Id: "4321", Valid: true}
 	err = eventPublisher.PublishEvent(orig5)
 
 	time.Sleep(1 * time.Second)

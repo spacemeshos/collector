@@ -10,9 +10,10 @@ import (
 	"net"
 	"strconv"
 )
+
 const (
-defaultGRPCServerPort  = 9091
-defaultJSONServerPort  = 9090
+	defaultGRPCServerPort = 9091
+	defaultJSONServerPort = 9090
 )
 
 type Database interface {
@@ -22,7 +23,7 @@ type Database interface {
 
 // GrpcService is a grpc server providing the collector api
 type GrpcService struct {
-	Server *grpc.Server
+	Server   *grpc.Server
 	dataBase Database
 }
 
@@ -30,7 +31,7 @@ type GrpcService struct {
 func NewGrpcService(dataBase Database) *GrpcService {
 
 	server := grpc.NewServer()
-	return &GrpcService{Server: server, dataBase:dataBase}
+	return &GrpcService{Server: server, dataBase: dataBase}
 }
 
 // StartService starts the grpc service.
@@ -93,13 +94,13 @@ func (s GrpcService) GetTransactionsByAccount(ctx context.Context, in *pb.Simple
 	if err != nil {
 		return nil, err
 	}
-	resp := make([]*pb.Tx, 0, len(txsFrom) + len(txsTo))
+	resp := make([]*pb.Tx, 0, len(txsFrom)+len(txsTo))
 	for _, tx := range txsFrom {
-		resp = append(resp, &pb.Tx{Id:tx.Id, Amount:tx.Amount,Origin:tx.Origin,Destination:tx.Destination,Gas:tx.Gas})
+		resp = append(resp, &pb.Tx{Id: tx.Id, Amount: tx.Amount, Origin: tx.Origin, Destination: tx.Destination, Gas: tx.Gas})
 	}
 	for _, tx := range txsTo {
-		resp = append(resp, &pb.Tx{Id:tx.Id, Amount:tx.Amount,Origin:tx.Origin,Destination:tx.Destination,Gas:tx.Gas})
+		resp = append(resp, &pb.Tx{Id: tx.Id, Amount: tx.Amount, Origin: tx.Origin, Destination: tx.Destination, Gas: tx.Gas})
 	}
 
-	return &pb.Txs{Txs:resp}, nil
+	return &pb.Txs{Txs: resp}, nil
 }
