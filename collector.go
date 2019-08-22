@@ -7,12 +7,14 @@ import (
 	"unsafe"
 )
 
+// eventsCollector collects events from node and writes them to DB
 type eventsCollector struct{
 	url string
 	stop chan struct{}
 	db Db
 }
 
+// NewCollector created a new instance of the collector listening on url for events and writing them to the provided Db
 func NewCollector(db Db, url string) *eventsCollector {
 	return &eventsCollector{url,make(chan struct{}),db}
 }
@@ -24,6 +26,7 @@ type Db interface {
 	StoreTxValid(event *events.ValidTx) error
 	StoreAtx(event *events.NewAtx) error
 	StoreAtxValid(event *events.ValidAtx) error
+	StoreReward(event *events.RewardReceived) error
 }
 
 func (c *eventsCollector) Start(blocking bool) {
@@ -51,6 +54,7 @@ func (c *eventsCollector) collectEvents(url string) {
 	txValid, err := sub.Subscribe(events.EventTxValid)
 	atxs, err := sub.Subscribe(events.EventNewAtx)
 	atxsValid, err := sub.Subscribe(events.EventAtxValid)
+	reward, err := sub.Subscribe(events.EventRewardReceived)
 	sub.StartListening()
 	if err != nil {
 		log.Info("cannot start subscriber")
@@ -119,6 +123,16 @@ func (c *eventsCollector) collectEvents(url string) {
 				log.Error("cannot parse received message %v", err)
 			}
 			err = c.db.StoreAtxValid(&e)
+			if err != nil {
+				log.Error("cannot write message %v", err)
+			}
+		case data  := <- reward:
+			var e events.RewardReceived
+			err := types.BytesToInterface(data[size:], &e)
+			if err != nil {
+				log.Error("cannot parse received message %v", err)
+			}
+			err = c.db.StoreReward(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
 			}

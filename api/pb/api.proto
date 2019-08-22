@@ -1,0 +1,36 @@
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+message SimpleMessage {
+	string value = 1;
+}
+
+message Tx {
+	string Id = 1;
+	string Origin = 2;
+	string Destination = 3;
+	uint64 Amount = 4;
+	uint64 Gas = 5;
+}
+
+message Txs {
+	repeated Tx txs = 1;
+}
+
+service CollectorService {
+	rpc Echo (SimpleMessage) returns (SimpleMessage) {
+		option (google.api.http) = {
+		post: "/v1/example/echo"
+		body: "*"
+	};
+	}
+	rpc GetTransactionsByAccount (SimpleMessage) returns (Txs) {
+		option (google.api.http) = {
+		post: "/v1/example/txsbyorigin"
+		body: "*"
+	};
+	}
+}
+

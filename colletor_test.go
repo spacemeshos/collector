@@ -13,6 +13,12 @@ type MockDb struct {
 	total int
 }
 
+func (m *MockDb) StoreReward(event *events.RewardReceived) error {
+	m.msgs[7]++
+	m.total++
+	return nil
+}
+
 func (m *MockDb) StoreBlock(event *events.NewBlock) error {
 	m.msgs[1]++
 	m.total++
