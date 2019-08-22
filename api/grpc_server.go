@@ -11,11 +11,6 @@ import (
 	"strconv"
 )
 
-const (
-	defaultGRPCServerPort = 9091
-	defaultJSONServerPort = 9090
-)
-
 type Database interface {
 	GetTransactionsFrom(orig string) ([]*events.NewTx, error)
 	GetTransactionsTo(orig string) ([]*events.NewTx, error)
@@ -25,13 +20,13 @@ type Database interface {
 type GrpcService struct {
 	Server   *grpc.Server
 	dataBase Database
+	port     int
 }
 
 // NewGrpcService create a new grpc service using config data.
-func NewGrpcService(dataBase Database) *GrpcService {
-
+func NewGrpcService(port int ,dataBase Database) *GrpcService {
 	server := grpc.NewServer()
-	return &GrpcService{Server: server, dataBase: dataBase}
+	return &GrpcService{Server: server, dataBase: dataBase, port:port}
 }
 
 // StartService starts the grpc service.
@@ -49,7 +44,7 @@ func (s GrpcService) StopService() {
 
 // This is a blocking method designed to be called using a go routine
 func (s *GrpcService) startServiceInternal(status chan bool) {
-	port := defaultGRPCServerPort
+	port := s.port
 	addr := ":" + strconv.Itoa(int(port))
 
 	lis, err := net.Listen("tcp", addr)

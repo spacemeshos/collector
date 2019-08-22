@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/spacemeshos/collector/api/pb"
+	"github.com/spacemeshos/go-spacemesh/p2p/node"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"io/ioutil"
@@ -17,13 +18,13 @@ import (
 
 func TestGrpcApi(t *testing.T) {
 
-	//port1, err := node.GetUnboundedPort()
+	port1, err := node.GetUnboundedPort()
 	//port2, err := node.GetUnboundedPort()
 	//assert.NoError(t, err, "Should be able to establish a connection on a port")
 
 	const message = "Hello World"
 
-	grpcService := NewGrpcService(nil)
+	grpcService := NewGrpcService(port1, nil)
 	grpcStatus := make(chan bool, 2)
 
 	// start a server
@@ -31,7 +32,7 @@ func TestGrpcApi(t *testing.T) {
 	<-grpcStatus
 
 	// start a client
-	addr := "localhost:" + strconv.Itoa(defaultGRPCServerPort)
+	addr := "localhost:" + strconv.Itoa(port1)
 
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(addr, grpc.WithInsecure())
@@ -55,8 +56,10 @@ func TestGrpcApi(t *testing.T) {
 }
 
 func TestJsonApi(t *testing.T) {
-	grpcService := NewGrpcService(nil)
-	jsonService := NewJSONHTTPServer()
+	port1, err := node.GetUnboundedPort()
+	port2, err := node.GetUnboundedPort()
+	grpcService := NewGrpcService(port1, nil)
+	jsonService := NewJSONHTTPServer(port2)
 
 	jsonStatus := make(chan bool, 2)
 	grpcStatus := make(chan bool, 2)
@@ -81,7 +84,7 @@ func TestJsonApi(t *testing.T) {
 	// because the server may not be ready to accept connections just yet.
 	time.Sleep(3 * time.Second)
 
-	url := fmt.Sprintf("http://127.0.0.1:%d/v1/example/echo", defaultJSONServerPort)
+	url := fmt.Sprintf("http://127.0.0.1:%d/v1/example/echo", port2)
 	resp, err := http.Post(url, contentType, strings.NewReader(payload))
 	assert.NoError(t, err, "failed to http post to api endpoint")
 

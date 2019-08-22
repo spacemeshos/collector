@@ -1,35 +1,44 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/spacemeshos/collector"
 	"github.com/spacemeshos/collector/api"
 	"github.com/spacemeshos/smutil/log"
-	"os"
+)
+
+const (
+	defaultGRPCServerPort = 9081
+	defaultJSONServerPort = 9080
 )
 
 func main() {
-	url := "tcp://localhost:56565"
+	/*url := "tcp://localhost:56565"
 	username := "postgres"
 	pass := "mysecretpassword"
-	if len(os.Args) > 1 {
-		url = os.Args[1]
-	}
-	if len(os.Args) > 3 {
-		username = os.Args[2]
-		pass = os.Args[3]
-	}
-	db := collector.NewDb(username, pass)
+	grpcPort := defaultGRPCServerPort
+	httpPort := defaultJSONServerPort*/
+
+	url := flag.String("url", "tcp://localhost:56565", "url from which events will be received")
+	username := flag.String("pg_uname", "postgres", "postgres username")
+	pass := flag.String("pg_passwd", "mysecretpassword", "postgres password")
+	grpcPort := flag.Int("grpc-port", defaultGRPCServerPort, "start grpc on this port")
+	httpPort := flag.Int("http-port", defaultJSONServerPort, "start http server on this port")
+
+	flag.Parse()
+
+	db := collector.NewDb(*username, *pass)
 	err := db.Start()
 	if err != nil {
 		log.Error("cannot create DB %v ", err)
 		return
 	}
 	defer db.Close()
-	c := collector.NewCollector(db, url)
+	c := collector.NewCollector(db, *url)
 
-	grpcService := api.NewGrpcService(db)
-	jsonService := api.NewJSONHTTPServer()
+	grpcService := api.NewGrpcService(*grpcPort,db)
+	jsonService := api.NewJSONHTTPServer(*httpPort)
 	waitGrpc := make(chan bool)
 	waitHttp := make(chan bool)
 

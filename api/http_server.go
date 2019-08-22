@@ -19,8 +19,8 @@ type JSONHTTPServer struct {
 }
 
 // NewJSONHTTPServer creates a new json http server.
-func NewJSONHTTPServer() *JSONHTTPServer {
-	return &JSONHTTPServer{Port: uint(defaultJSONServerPort), stop: make(chan bool)}
+func NewJSONHTTPServer(port int) *JSONHTTPServer {
+	return &JSONHTTPServer{Port: uint(port), stop: make(chan bool)}
 }
 
 // StopService stops the server.
@@ -53,7 +53,7 @@ func (s JSONHTTPServer) startInternal(status chan bool) {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	// register the http server on the local grpc server
-	portStr := strconv.Itoa(int(defaultGRPCServerPort))
+	portStr := strconv.Itoa(int(s.Port))
 
 	const endpoint = "api_endpoint"
 	var echoEndpoint string

@@ -29,6 +29,7 @@ type Db interface {
 	StoreReward(event *events.RewardReceived) error
 }
 
+// Starts collecting events
 func (c *eventsCollector) Start(blocking bool) {
 	if blocking {
 		c.collectEvents(c.url)
@@ -72,6 +73,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new block %v", e)
 			err = c.db.StoreBlock(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -82,6 +84,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new block validation %v", e)
 			err = c.db.StoreBlockValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -92,6 +95,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new tx %v", e)
 			err = c.db.StoreTx(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -102,6 +106,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new tx validation %v", e)
 			err = c.db.StoreTxValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -112,6 +117,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new atx %v", e)
 			err = c.db.StoreAtx(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -122,6 +128,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new atx validation %v", e)
 			err = c.db.StoreAtxValid(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)
@@ -132,6 +139,7 @@ loop:
 			if err != nil {
 				log.Error("cannot parse received message %v", err)
 			}
+			log.Info("got new reward %v", e)
 			err = c.db.StoreReward(&e)
 			if err != nil {
 				log.Error("cannot write message %v", err)

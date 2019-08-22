@@ -43,7 +43,7 @@ func (db *Database) GetTransactionsFrom(origin string) ([]*events.NewTx, error) 
 
 func (db *Database) GetTransactionsTo(origin string) ([]*events.NewTx, error) {
 	var blocks []*events.NewTx
-	err := db.inst.Model(&blocks).Where("origin = ?", origin).Select()
+	err := db.inst.Model(&blocks).Where("destination = ?", origin).Select()
 	return blocks, err
 
 }
