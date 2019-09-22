@@ -7,7 +7,7 @@ import (
 )
 
 func Test_WriteObjectToDB(t *testing.T) {
-	db := NewDb("postgres", "mysecretpassword")
+	db := NewDb("postgres", "mysecretpassword", "localhost:5432")
 	defer func() { assert.NoError(t, db.Close()) }()
 	err := db.createTables(true)
 	assert.NoError(t, err)
@@ -30,7 +30,7 @@ func Test_WriteObjectToDB(t *testing.T) {
 }
 
 func Test_ReadQuery(t *testing.T) {
-	db := NewDb("postgres", "mysecretpassword")
+	db := NewDb("postgres", "mysecretpassword", "localhost:5432")
 	defer func() { assert.NoError(t, db.Close()) }()
 	err := db.createTables(true)
 	assert.NoError(t, err)
@@ -48,6 +48,6 @@ func Test_ReadQuery(t *testing.T) {
 	assert.Equal(t, 2, len(txs))
 
 	txs, err = db.GetTransactionsTo("2222")
-	assert.Equal(t, 2, len(txs))
+	assert.Equal(t, 3, len(txs))
 
 }
