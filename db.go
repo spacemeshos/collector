@@ -60,7 +60,7 @@ func NewDb(userName, pass string, postgresUrl string) *Database {
 	d.inst = pg.Connect(&pg.Options{
 		User:     userName,
 		Password: pass,
-		Addr: postgresUrl,
+		Addr:     postgresUrl,
 	})
 	return &d
 }

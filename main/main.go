@@ -21,7 +21,7 @@ func main() {
 	httpPort := defaultJSONServerPort*/
 
 	url := flag.String("url", "tcp://localhost:56565", "url from which events will be received")
-        postgresUrl := flag.String("pg_url", "localhost:5432", "postgres url")
+	postgresUrl := flag.String("pg_url", "localhost:5432", "postgres url")
 	username := flag.String("pg_uname", "postgres", "postgres username")
 	pass := flag.String("pg_passwd", "mysecretpassword", "postgres password")
 	grpcPort := flag.Int("grpc-port", defaultGRPCServerPort, "start grpc on this port")
@@ -38,7 +38,7 @@ func main() {
 	defer db.Close()
 	c := collector.NewCollector(db, *url)
 
-	grpcService := api.NewGrpcService(*grpcPort,db)
+	grpcService := api.NewGrpcService(*grpcPort, db)
 	jsonService := api.NewJSONHTTPServer(*httpPort)
 	waitGrpc := make(chan bool)
 	waitHttp := make(chan bool)
