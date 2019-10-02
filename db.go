@@ -55,11 +55,12 @@ type Database struct {
 
 // NewDb creates a new database connection using userName and password to the database instance.
 // It will connect to postgress DB on port 5432 (Postgres default port).
-func NewDb(userName, pass string) *Database {
+func NewDb(userName, pass string, postgresUrl string) *Database {
 	d := Database{nil}
 	d.inst = pg.Connect(&pg.Options{
 		User:     userName,
 		Password: pass,
+		Addr:     postgresUrl,
 	})
 	return &d
 }

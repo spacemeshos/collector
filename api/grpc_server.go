@@ -24,9 +24,9 @@ type GrpcService struct {
 }
 
 // NewGrpcService create a new grpc service using config data.
-func NewGrpcService(port int ,dataBase Database) *GrpcService {
+func NewGrpcService(port int, dataBase Database) *GrpcService {
 	server := grpc.NewServer()
-	return &GrpcService{Server: server, dataBase: dataBase, port:port}
+	return &GrpcService{Server: server, dataBase: dataBase, port: port}
 }
 
 // StartService starts the grpc service.

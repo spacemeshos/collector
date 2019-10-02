@@ -9,3 +9,6 @@ docker run --name pgadmin -p 8080:80 -e "PGADMIN_DEFAULT_EMAIL=anton@mail.com" -
 to compile protobuf files run
 
 `./scripts/genproto.sh `
+
+### Run
+docker run --rm --name collector spacemeshos/collector:latest --help
